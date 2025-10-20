@@ -23,6 +23,7 @@ model Meal {
   ingredients String?
   imageUrl    String?
   likedBy     User[]   @relation("UserLikedMeals")
+  ownerId     Int?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

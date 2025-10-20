@@ -17,7 +17,7 @@ app.use(cors());
 app.use("/api", routes);
 // app.use("/meal", mealRouter);
 app.use("/userP", userPRouter);
-app.use("mealP", mealPouter);
+app.use("/mealP", mealPouter);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("🚀 Express + TypeScript server running!");
@@ -26,3 +26,4 @@ app.get("/", (req: Request, res: Response) => {
 app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
 });
+console.log("✅ mealPouter loaded:", typeof mealPouter);
