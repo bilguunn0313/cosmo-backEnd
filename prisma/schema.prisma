@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int     @id @default(autoincrement())
+  email     String  @unique
+  password  String
+  role      Role    @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  likedMeals Meal[] @relation("UserLikedMeals")
+}
+
+model Meal {
+  id          Int      @id @default(autoincrement())
+  foodName    String
+  ingredients String?
+  imageUrl    String?
+  likedBy     User[]   @relation("UserLikedMeals")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+  CHEF
+}
+

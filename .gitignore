@@ -8,3 +8,5 @@ dist
 codingwithado.json
 .vercel
 /src/generated/prisma
+
+/src/generated/prisma

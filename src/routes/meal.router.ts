@@ -1,8 +1,8 @@
-import express from "express";
-import { createMeal } from "../controller/meal.controller";
+// import express from "express";
+// import { createMeal } from "../controller/meal.controller";
 
-const mealRouter = express.Router();
+// const mealRouter = express.Router();
 
-mealRouter.post("/create", createMeal);
+// mealRouter.post("/create", createMeal);
 
-export default mealRouter;
+// export default mealRouter;
