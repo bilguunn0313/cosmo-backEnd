@@ -9,7 +9,6 @@ export const createUserP = async (req: Request, res: Response) => {
   const { email, password, role } = req.body;
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  console.log(req.body);
 
   try {
     const existingUser = await prisma.user.findUnique({
