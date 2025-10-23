@@ -73,9 +73,21 @@ class OdooService {
   }
 
   /**
-   * Get all users from Odoo
+   * Get all users from Odoo (with caching)
    */
-  async getAllUsers(): Promise<OdooUser[]> {
+  async getAllUsers(useCache: boolean = true): Promise<OdooUser[]> {
+    // Try cache first if enabled
+    if (useCache) {
+      const { getCacheService } = await import("./cache.service");
+      const cacheService = getCacheService();
+
+      const cached = await cacheService.getCachedAllUsers();
+      if (cached) {
+        console.log("✅ Cache hit: all users");
+        return cached;
+      }
+    }
+
     await this.ensureConnection();
 
     try {
@@ -86,7 +98,6 @@ class OdooService {
           "id",
           "name",
           "login",
-          "password",
           "email",
           "partner_id",
           "company_id",
@@ -95,6 +106,13 @@ class OdooService {
           "write_date",
         ]
       );
+
+      // Cache the result
+      if (useCache) {
+        const { getCacheService } = await import("./cache.service");
+        const cacheService = getCacheService();
+        await cacheService.cacheAllUsers(users);
+      }
 
       return users;
     } catch (error) {
@@ -119,14 +137,12 @@ class OdooService {
           "id",
           "name",
           "login",
-          "password",
           "email",
           "partner_id",
           "company_id",
           "active",
           "create_date",
           "write_date",
-          "role",
         ]
       );
 

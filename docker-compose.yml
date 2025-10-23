@@ -1,58 +1,48 @@
 version: "3.9"
 
 services:
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: app-backend
-    restart: always
-    ports:
-      - "4000:4000"
+  server:
+    build: .
+    container_name: cosmo-odoo-server
+    restart: unless-stopped
     env_file:
       - .env
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    volumes:
-      - .:/app
-      - node_modules:/app/node_modules
-
-  db:
-    image: postgres:15
-    container_name: app-db
-    restart: always
-    environment:
-      POSTGRES_USER: odoo
-      POSTGRES_PASSWORD: odoo
-      POSTGRES_DB: erp_db
     ports:
-      - "5432:5432"
-    volumes:
-      - pg_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U odoo"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - "3000:3000"
+    depends_on:
+      - redis
+      - odoo
+    networks:
+      - cosmo-network
 
   redis:
-    image: redis:7
-    container_name: app-redis
-    restart: always
+    image: redis:7-alpine
+    container_name: cosmo-redis
+    restart: unless-stopped
     ports:
       - "6379:6379"
+    networks:
+      - cosmo-network
+
+  odoo:
+    image: odoo:16.0
+    container_name: cosmo-odoo
+    restart: unless-stopped
+    ports:
+      - "8069:8069"
+    environment:
+      - HOST=0.0.0.0
+      - USER=odoo
+      - PASSWORD=odoo
+      - DB=cosmo
+    networks:
+      - cosmo-network
     volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - odoo-data:/var/lib/odoo
+
+networks:
+  cosmo-network:
+    driver: bridge
 
 volumes:
-  pg_data:
-  redis_data:
-  node_modules:
+  odoo-data:

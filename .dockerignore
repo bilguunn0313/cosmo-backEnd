@@ -17,17 +17,9 @@ coverage
 .env.development
 .env.production
 
-# Git & configs
-.git
-.gitignore
-Dockerfile
-docker-compose.yml
-
-# OS files
+# OS & IDE files
 .DS_Store
 Thumbs.db
-
-# IDE/editor
 .vscode
 .idea
 *.swp

@@ -17,18 +17,18 @@ handleUncaughtException();
 const app: Application = express();
 
 // INITIALIZE REDIS
-// const initializeRedis = async () => {
-//   try {
-//     const redisConfig = getRedisConfig();
-//     await redisConfig.getClient();
-//     console.log("✅ Redis initialized");
-//   } catch (error) {
-//     console.error("❌ Redis initialization failed:", error);
-//     console.warn("⚠️ Server will continue without Redis");
-//     // Don't crash the server if Redis is unavailable
-//   }
-// };
-// initializeRedis();
+const initializeRedis = async () => {
+  try {
+    const redisConfig = getRedisConfig();
+    await redisConfig.getClient();
+    console.log("✅ Redis initialized");
+  } catch (error) {
+    console.error("❌ Redis initialization failed:", error);
+    console.warn("⚠️ Server will continue without Redis");
+    // Don't crash the server if Redis is unavailable
+  }
+};
+initializeRedis();
 
 // Security headers
 app.use(helmet());

@@ -1,20 +1,41 @@
-# Use a lightweight Node.js base image
-FROM node:20-alpine
+# Stage 1: Dependencies
+FROM node:20-alpine AS dependencies
 
-# Set the working directory
 WORKDIR /app
 
-# Copy only package.json and package-lock.json first to leverage Docker's caching
+# Install dependencies for native builds
+RUN apk add --no-cache python3 make g++
+
+# Copy package files
 COPY package*.json ./
+COPY prisma ./prisma/
 
-# Install dependencies (production-only)
-RUN npm install --production
+# Install dependencies
+RUN npm ci
 
-# Copy the rest of the application files
+# Stage 2: Build
+FROM node:20-alpine AS build
+WORKDIR /app
+
+COPY --from=dependencies /app/node_modules ./node_modules
 COPY . .
 
-# Expose the port your application runs on (optional, for documentation purposes)
-EXPOSE 4000
+# Generate Prisma client
+RUN npx prisma generate
 
-# Start the application
-CMD ["node", "src/index.js"]
+# Stage 3: Production image
+FROM node:20-alpine AS production
+WORKDIR /app
+
+# Copy build artifacts and node_modules
+COPY --from=build /app ./
+
+# Expose port
+EXPOSE 3000
+
+# Set environment variables (can override with docker-compose)
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Start server
+CMD ["node", "dist/index.js"]
