@@ -2,10 +2,19 @@
   "name": "cosmo-odoo",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "docker:dev": "docker compose up",
+    "docker:prod": "docker compose up -d",
+    "docker:build": "docker compose up --build -d",
+    "docker:logs": "docker compose logs -f",
+    "docker:stop": "docker compose down",
+    "docker:restart": "docker compose restart",
+    "docker:rebuild": "docker compose down && docker compose up --build -d"
   },
   "keywords": [],
   "author": "",
@@ -23,14 +32,12 @@
     "odoo-await": "^3.4.1"
   },
   "devDependencies": {
-    "@prisma/client": "^6.17.1",
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.7.2",
     "@types/redis": "^4.0.10",
-    "prisma": "^6.17.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"
   }

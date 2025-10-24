@@ -1,48 +1,58 @@
-version: "3.9"
+version: "3.8"
 
 services:
-  server:
-    build: .
-    container_name: cosmo-odoo-server
-    restart: unless-stopped
-    env_file:
-      - .env
-    ports:
-      - "3000:3000"
-    depends_on:
-      - redis
-      - odoo
-    networks:
-      - cosmo-network
-
+  # Redis cache (simple, lightweight)
   redis:
     image: redis:7-alpine
     container_name: cosmo-redis
     restart: unless-stopped
     ports:
       - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
     networks:
       - cosmo-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
-  odoo:
-    image: odoo:16.0
-    container_name: cosmo-odoo
+  # Your Express.js API
+  express-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cosmo-express-api
     restart: unless-stopped
     ports:
-      - "8069:8069"
-    environment:
-      - HOST=0.0.0.0
-      - USER=odoo
-      - PASSWORD=odoo
-      - DB=cosmo
+      - "5000:5000"
+    env_file:
+      - .env # Load ALL variables from .env file (SECURE!)
+    depends_on:
+      redis:
+        condition: service_healthy
     networks:
       - cosmo-network
-    volumes:
-      - odoo-data:/var/lib/odoo
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:5000/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 networks:
   cosmo-network:
     driver: bridge
 
 volumes:
-  odoo-data:
+  redis-data:

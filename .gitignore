@@ -1,12 +1,30 @@
-node_modules
-# Keep environment variables out of version control
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Environment variables (NEVER COMMIT!)
 .env
+.env.local
+.env.production
+.env.*.local
 
-/generated/prisma
-dist
+# Logs
+logs/
+*.log
+npm-debug.log*
 
-codingwithado.json
-.vercel
-/src/generated/prisma
+# OS files
+.DS_Store
+Thumbs.db
 
-/src/generated/prisma
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker volumes (local development)
+redis-data/

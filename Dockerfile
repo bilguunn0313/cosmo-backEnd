@@ -1,41 +1,34 @@
-# Stage 1: Dependencies
-FROM node:20-alpine AS dependencies
+# Use Node.js 20 LTS
+FROM node:20-alpine
 
-WORKDIR /app
+# Install wget for healthcheck
+RUN apk add --no-cache wget
 
-# Install dependencies for native builds
-RUN apk add --no-cache python3 make g++
+# Set working directory
+WORKDIR /usr/src/app
 
 # Copy package files
 COPY package*.json ./
-COPY prisma ./prisma/
 
-# Install dependencies
-RUN npm ci
+# Install ALL dependencies (including devDependencies for TypeScript)
+RUN npm install
 
-# Stage 2: Build
-FROM node:20-alpine AS build
-WORKDIR /app
-
-COPY --from=dependencies /app/node_modules ./node_modules
+# Copy source code
 COPY . .
 
-# Generate Prisma client
-RUN npx prisma generate
+# Copy env file explicitly
+# COPY .env .env
 
-# Stage 3: Production image
-FROM node:20-alpine AS production
-WORKDIR /app
-
-# Copy build artifacts and node_modules
-COPY --from=build /app ./
+# Build TypeScript to JavaScript
+RUN npm run build
 
 # Expose port
-EXPOSE 3000
+EXPOSE 5000
 
-# Set environment variables (can override with docker-compose)
-ENV NODE_ENV=production
-ENV PORT=3000
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s \
+  CMD wget --quiet --tries=1 --spider http://localhost:5000/health || exit 1
 
-# Start server
-CMD ["node", "dist/index.js"]
+# Start the app
+# This will use whatever is in your package.json "start" script
+CMD ["npm", "start"]

@@ -7,7 +7,7 @@ import {
   getUserByEmail,
   getUserById,
 } from "../controller/users/getUser.controller";
-import { login } from "../controller/auth.controller";
+import { login } from "../controller/users/auth.controller";
 import { verifyToken } from "../controller/users/odooAuth.controller";
 import {
   loginRateLimit,

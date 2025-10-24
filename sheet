@@ -1,0 +1,5 @@
+# Only if you had these situations:
+volumes:
+  - ./logs:/usr/src/app/logs # Persistent logs
+  - ./uploads:/usr/src/app/uploads # User uploaded files
+  - postgres-data:/var/lib/postgresql # If running DB locally
